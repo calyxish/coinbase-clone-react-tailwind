@@ -1,30 +1,80 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { api } from '../services';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const refreshProfile = async () => {
     try {
-      const stored = localStorage.getItem('cb_user');
-      return stored ? JSON.parse(stored) : null;
-    } catch {
+      const data = await api.get('/profile');
+      setUser(data.user || null);
+      return data.user || null;
+    } catch (err) {
+      setUser(null);
       return null;
     }
-  });
-
-  const login = (email) => {
-    const u = { email };
-    setUser(u);
-    localStorage.setItem('cb_user', JSON.stringify(u));
   };
 
-  const logout = () => {
+  useEffect(() => {
+    let isActive = true;
+
+    const loadProfile = async () => {
+      try {
+        await refreshProfile();
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadProfile();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const login = async (email, password) => {
+    setError(null);
+    const data = await api.post('/login', { email, password });
+    setUser(data.user || null);
+    return data.user || null;
+  };
+
+  const register = async (name, email, password) => {
+    setError(null);
+    const data = await api.post('/register', { name, email, password });
+    setUser(data.user || null);
+    return data.user || null;
+  };
+
+  const logout = async () => {
+    setError(null);
+    await api.post('/logout', {});
     setUser(null);
-    localStorage.removeItem('cb_user');
   };
+
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      error,
+      setError,
+      login,
+      register,
+      logout,
+      refreshProfile,
+    }),
+    [user, loading, error]
+  );
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

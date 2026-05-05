@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useLivePrices } from '../context/LivePricesContext';
 import useReveal from '../hooks/useReveal';
@@ -38,7 +38,8 @@ function Sparkline({ positive }) {
 }
 
 function AssetDetail() {
-  const cryptoData = useLivePrices() ?? [];
+  const { coins, loading, error } = useLivePrices() ?? {};
+  const cryptoData = coins || [];
   const { id } = useParams();
   const crypto = cryptoData.find((c) => c.id === id);
   const [tradeTab, setTradeTab]       = useState('buy');
@@ -46,6 +47,27 @@ function AssetDetail() {
   const [spendAmount, setSpendAmount] = useState('');
   const [focused, setFocused]         = useState(false);
   const aboutRef = useReveal();
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '0.9375rem', color: '#6B7280' }}>Loading asset...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '0.9375rem', color: '#DC2626' }}>{error}</p>
+          <Link to="/explore" style={{ color: '#1652F0' }}>Back to Explore</Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!crypto) {
     return (

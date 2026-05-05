@@ -1,5 +1,5 @@
 ﻿import { Link } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useLivePrices } from '../context/LivePricesContext';
 import useReveal from '../hooks/useReveal';
 
@@ -99,8 +99,9 @@ function Explore() {
   const STATS_PER_PAGE  = 3;
   const MOVERS_PER_PAGE = 2;
 
-  const cryptoData = useLivePrices() ?? [];
-  const topMovers = [...cryptoData].sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h));
+  const { coins, gainers, loading, error } = useLivePrices() ?? {};
+  const cryptoData = coins || [];
+  const topMovers = (gainers && gainers.length ? gainers : [...cryptoData].sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h)));
   const visibleStats  = MARKET_STATS.slice(statsOffset,  statsOffset  + STATS_PER_PAGE);
   const visibleMovers = topMovers.slice(moversOffset, moversOffset + MOVERS_PER_PAGE);
 
@@ -242,7 +243,13 @@ function Explore() {
               </div>
               <p style={{ fontSize: '0.8125rem', color: '#6B7280', margin: '0 0 14px' }}>24hr change</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                {visibleMovers.map(crypto => {
+                {loading && (
+                  <p style={{ gridColumn: '1 / -1', color: '#6B7280', fontSize: '0.875rem' }}>Loading movers...</p>
+                )}
+                {error && !loading && (
+                  <p style={{ gridColumn: '1 / -1', color: '#EF4444', fontSize: '0.875rem' }}>{error}</p>
+                )}
+                {!loading && !error && visibleMovers.map(crypto => {
                   const isUp = crypto.change24h >= 0;
                   const col  = coinColors[crypto.id] || '#6B7280';
                   return (
@@ -262,6 +269,9 @@ function Explore() {
                     </Link>
                   );
                 })}
+                {!loading && !error && visibleMovers.length === 0 && (
+                  <p style={{ gridColumn: '1 / -1', color: '#6B7280', fontSize: '0.875rem' }}>No movers available.</p>
+                )}
               </div>
             </div>
           </div>
@@ -289,7 +299,21 @@ function Explore() {
                 </tr>
               </thead>
               <tbody>
-                {filteredCrypto.map((crypto, idx) => {
+                {loading && (
+                  <tr>
+                    <td colSpan={5} style={{ padding: '16px 20px', color: '#6B7280', fontSize: '0.875rem' }}>
+                      Loading assets...
+                    </td>
+                  </tr>
+                )}
+                {error && !loading && (
+                  <tr>
+                    <td colSpan={5} style={{ padding: '16px 20px', color: '#EF4444', fontSize: '0.875rem' }}>
+                      {error}
+                    </td>
+                  </tr>
+                )}
+                {!loading && !error && filteredCrypto.map((crypto, idx) => {
                   const isUp = crypto.change24h >= 0;
                   const iconColor = coinColors[crypto.id] || '#6B7280';
                   return (
@@ -306,9 +330,7 @@ function Explore() {
                         </div>
                       </td>
                       <td style={{ padding: '16px 20px', whiteSpace: 'nowrap', fontSize: '0.9375rem', fontWeight: '700', color: '#111827', fontVariantNumeric: 'tabular-nums' }}>
-                        <span key={crypto._tick} className={crypto._dir >= 0 ? 'price-flash-up' : 'price-flash-down'}>
-                          {fmt(crypto.price)}
-                        </span>
+                        {fmt(crypto.price)}
                       </td>
                       <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>
                         <span style={{ fontSize: '0.875rem', fontWeight: '600', color: isUp ? '#16A34A' : '#DC2626', background: isUp ? '#F0FDF4' : '#FEF2F2', padding: '3px 10px', borderRadius: '99px' }}>
@@ -330,7 +352,7 @@ function Explore() {
             </table>
           </div>
 
-          {filteredCrypto.length === 0 && (
+          {!loading && !error && filteredCrypto.length === 0 && (
             <div style={{ textAlign: 'center', padding: '56px 24px' }}>
               <svg width="48" height="48" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" style={{ margin: '0 auto 16px' }}>
                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>

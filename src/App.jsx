@@ -9,13 +9,24 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import AdvancedTrading from './pages/AdvancedTrading';
 import Dashboard from './pages/Dashboard';
+import AddCrypto from './pages/AddCrypto';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LivePricesProvider } from './context/LivePricesContext';
+import StudentBanner from './components/layout/StudentBanner';
 
 const AUTH_ROUTES = ['/signin', '/signup'];
 
 function PrivateRoute({ children }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-gray-500 text-sm">Checking session...</p>
+      </div>
+    );
+  }
+
   return user ? children : <Navigate to="/signin" replace />;
 }
 
@@ -25,6 +36,7 @@ function AppLayout() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <StudentBanner />
       {!isAuthPage && <Navbar />}
       <main className="flex-grow">
         <Routes>
@@ -36,6 +48,7 @@ function AppLayout() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/advanced-trading" element={<AdvancedTrading />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/add-crypto" element={<PrivateRoute><AddCrypto /></PrivateRoute>} />
         </Routes>
       </main>
       {!isAuthPage && <Footer />}

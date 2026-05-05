@@ -23,6 +23,16 @@ git clone <your-repository-url>
 npm install
 ```
 
+### 2.1 Configure API Base URL
+
+Create a `.env` file using `.env.example` and set your backend URL:
+
+```bash
+VITE_API_BASE_URL=http://localhost:5001
+```
+
+If your backend is deployed, replace the value with the deployed URL.
+
 ### 3. Start the Development Server
 
 ```bash
@@ -30,6 +40,24 @@ npm run dev
 ```
 
 The app will be available at `http://localhost:5173`
+
+---
+
+## 🔌 Backend Integration
+
+The frontend expects the following backend endpoints:
+
+- POST /register
+- POST /login
+- POST /logout
+- GET /profile (protected)
+- GET /crypto
+- GET /crypto/gainers
+- GET /crypto/new
+- POST /crypto
+- GET /health
+
+Make sure your backend supports cookies and CORS with credentials.
 
 ---
 

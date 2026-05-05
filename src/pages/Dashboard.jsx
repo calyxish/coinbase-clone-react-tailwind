@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLivePrices } from '../context/LivePricesContext';
 import { useAuth } from '../context/AuthContext';
@@ -7,18 +7,18 @@ import CryptoCard from '../components/crypto/CryptoCard';
 
 // ── Static portfolio data ─────────────────────────────────────
 const PORTFOLIO_ASSETS = [
-  { name: 'Crypto',       initial: '₿', color: '#D97706', bg: '#FEF3C7', value: 14186.12, change: null   },
-  { name: 'Stocks',       initial: 'S', color: '#2563EB', bg: '#DBEAFE', value: 8133.98,  change: null   },
-  { name: 'Derivatives',  initial: 'D', color: '#7C3AED', bg: '#EDE9FE', value: 148.84,   change: 148.84 },
-  { name: 'Predictions',  initial: 'P', color: '#059669', bg: '#D1FAE5', value: 42.69,    change: 42.69  },
-  { name: 'Cash',         initial: '$', color: '#0891B2', bg: '#CFFAFE', value: 10124.22, change: null   },
+  { name: 'Crypto', initial: '₿', color: '#D97706', bg: '#FEF3C7', value: 14186.12, change: null },
+  { name: 'Stocks', initial: 'S', color: '#2563EB', bg: '#DBEAFE', value: 8133.98, change: null },
+  { name: 'Derivatives', initial: 'D', color: '#7C3AED', bg: '#EDE9FE', value: 148.84, change: 148.84 },
+  { name: 'Predictions', initial: 'P', color: '#059669', bg: '#D1FAE5', value: 42.69, change: 42.69 },
+  { name: 'Cash', initial: '$', color: '#0891B2', bg: '#CFFAFE', value: 10124.22, change: null },
 ];
 
 const RECENT_TXS = [
-  { type: 'Buy',  coin: 'Bitcoin',  symbol: 'BTC', amount: '0.0124 BTC', value: 841.28,   date: 'Today, 9:42 AM' },
-  { type: 'Sell', coin: 'Ethereum', symbol: 'ETH', amount: '0.5 ETH',    value: 1771.09,  date: 'Yesterday'      },
-  { type: 'Buy',  coin: 'Solana',   symbol: 'SOL', amount: '4.2 SOL',    value: 749.43,   date: 'Mar 5'          },
-  { type: 'Buy',  coin: 'Cardano',  symbol: 'ADA', amount: '1,200 ADA',  value: 816.00,   date: 'Mar 3'          },
+  { type: 'Buy', coin: 'Bitcoin', symbol: 'BTC', amount: '0.0124 BTC', value: 841.28, date: 'Today, 9:42 AM' },
+  { type: 'Sell', coin: 'Ethereum', symbol: 'ETH', amount: '0.5 ETH', value: 1771.09, date: 'Yesterday' },
+  { type: 'Buy', coin: 'Solana', symbol: 'SOL', amount: '4.2 SOL', value: 749.43, date: 'Mar 5' },
+  { type: 'Buy', coin: 'Cardano', symbol: 'ADA', amount: '1,200 ADA', value: 816.00, date: 'Mar 3' },
 ];
 
 const PERIODS = ['1H', '1D', '1W', '1M', '1Y', 'All'];
@@ -40,7 +40,8 @@ function Reveal({ children, className = 'reveal-fade-up', delay = 0, style = {} 
 
 // ── Dashboard ─────────────────────────────────────────────────
 export default function Dashboard() {
-  const cryptoData = useLivePrices() ?? [];
+  const { coins, loading, error } = useLivePrices() ?? {};
+  const cryptoData = coins || [];
   const { user } = useAuth();
   const navigate = useNavigate();
   const [activePeriod, setActivePeriod] = useState('1D');
@@ -48,9 +49,17 @@ export default function Dashboard() {
   const [selectedCoin, setSelectedCoin] = useState('bitcoin');
   const [buyAmount, setBuyAmount] = useState('');
 
+  useEffect(() => {
+    if (!selectedCoin && cryptoData.length > 0) {
+      setSelectedCoin(cryptoData[0].id);
+    }
+  }, [cryptoData, selectedCoin]);
+
   const selectedCoinData = cryptoData.find(c => c.id === selectedCoin);
-  const estimatedReceive = buyAmount && selectedCoinData
-    ? (parseFloat(buyAmount) / selectedCoinData.price).toFixed(6)
+  const selectedSymbol = selectedCoinData?.symbol || '---';
+  const selectedPrice = selectedCoinData?.price || 0;
+  const estimatedReceive = buyAmount && selectedPrice
+    ? (parseFloat(buyAmount) / selectedPrice).toFixed(6)
     : null;
 
   const displayName = user?.email?.split('@')[0] ?? 'there';
@@ -63,15 +72,20 @@ export default function Dashboard() {
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <h1 style={{ fontSize: 'clamp(1.1rem,3vw,1.375rem)', fontWeight: '800', color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>
-              Good morning, <span style={{ color: '#1652F0' }}>{displayName}</span> 👋
+              Good morning, <span style={{ color: '#1652F0' }}>{displayName}</span>
             </h1>
             <p style={{ color: '#6B7280', fontSize: '0.875rem', margin: '3px 0 0', fontWeight: '500' }}>
               March 8, 2026 · Your portfolio at a glance
             </p>
           </div>
-          <Link to="/explore" style={{ padding: '7px 16px', background: '#F3F4F6', color: '#6B7280', borderRadius: '8px', fontWeight: '600', fontSize: '0.8125rem', textDecoration: 'none', border: '1px solid #E5E7EB' }}>
-            Explore Markets
-          </Link>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <Link to="/add-crypto" style={{ padding: '7px 16px', background: '#1652F0', color: '#fff', borderRadius: '8px', fontWeight: '600', fontSize: '0.8125rem', textDecoration: 'none', border: '1px solid #1652F0' }}>
+              + Add Asset
+            </Link>
+            <Link to="/explore" style={{ padding: '7px 16px', background: '#F3F4F6', color: '#6B7280', borderRadius: '8px', fontWeight: '600', fontSize: '0.8125rem', textDecoration: 'none', border: '1px solid #E5E7EB' }}>
+              Explore Markets
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -156,51 +170,63 @@ export default function Dashboard() {
                 <Link to="/explore" style={{ fontSize: '0.875rem', fontWeight: '600', color: '#1652F0', textDecoration: 'none' }}>View all →</Link>
               </div>
               <div className="table-scroll-wrap">
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr>
-                    {['Asset', 'Price', '24h', 'Market Cap'].map(h => (
-                      <th key={h} style={{ textAlign: h === 'Asset' ? 'left' : 'right', padding: '8px 10px', fontSize: '0.7rem', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', borderBottom: '1px solid #F3F4F6' }}>
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {cryptoData.map((coin, i) => (
-                    <tr
-                      key={coin.id}
-                      onClick={() => navigate(`/asset/${coin.id}`)}
-                      style={{ cursor: 'pointer', transition: 'background 0.1s' }}
-                      onMouseEnter={e => { e.currentTarget.style.background = '#F9FAFB'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
-                    >
-                      <td style={{ padding: '12px 10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{ width: 32, height: 32, borderRadius: '50%', background: `hsl(${i * 36},68%,92%)`, color: `hsl(${i * 36},55%,42%)`, fontWeight: '800', fontSize: '0.6875rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {coin.symbol.slice(0, 3)}
-                          </div>
-                          <div>
-                            <p style={{ margin: 0, fontWeight: '700', color: '#111827', fontSize: '0.875rem' }}>{coin.name}</p>
-                            <p style={{ margin: 0, color: '#9CA3AF', fontSize: '0.75rem' }}>{coin.symbol}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{ textAlign: 'right', padding: '12px 10px', fontWeight: '700', color: '#111827', fontSize: '0.875rem', fontVariantNumeric: 'tabular-nums' }}>
-                        <span key={coin._tick} className={coin._dir >= 0 ? 'price-flash-up' : 'price-flash-down'}>
-                          ${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: 'right', padding: '12px 10px', fontWeight: '700', fontSize: '0.875rem', color: coin.change24h >= 0 ? '#22C55E' : '#EF4444' }}>
-                        {coin.change24h >= 0 ? '▲' : '▼'} {Math.abs(coin.change24h).toFixed(2)}%
-                      </td>
-                      <td style={{ textAlign: 'right', padding: '12px 10px', color: '#6B7280', fontSize: '0.8125rem', fontVariantNumeric: 'tabular-nums' }}>
-                        ${(coin.marketCap / 1e9).toFixed(1)}B
-                      </td>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      {['Asset', 'Price', '24h', 'Market Cap'].map(h => (
+                        <th key={h} style={{ textAlign: h === 'Asset' ? 'left' : 'right', padding: '8px 10px', fontSize: '0.7rem', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.07em', borderBottom: '1px solid #F3F4F6' }}>
+                          {h}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {loading && (
+                      <tr>
+                        <td colSpan={4} style={{ padding: '16px 10px', color: '#6B7280', fontSize: '0.875rem' }}>
+                          Loading assets...
+                        </td>
+                      </tr>
+                    )}
+                    {error && !loading && (
+                      <tr>
+                        <td colSpan={4} style={{ padding: '16px 10px', color: '#EF4444', fontSize: '0.875rem' }}>
+                          {error}
+                        </td>
+                      </tr>
+                    )}
+                    {!loading && !error && cryptoData.map((coin, i) => (
+                      <tr
+                        key={coin.id}
+                        onClick={() => navigate(`/asset/${coin.id}`)}
+                        style={{ cursor: 'pointer', transition: 'background 0.1s' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#F9FAFB'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                      >
+                        <td style={{ padding: '12px 10px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: `hsl(${i * 36},68%,92%)`, color: `hsl(${i * 36},55%,42%)`, fontWeight: '800', fontSize: '0.6875rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              {coin.symbol.slice(0, 3)}
+                            </div>
+                            <div>
+                              <p style={{ margin: 0, fontWeight: '700', color: '#111827', fontSize: '0.875rem' }}>{coin.name}</p>
+                              <p style={{ margin: 0, color: '#9CA3AF', fontSize: '0.75rem' }}>{coin.symbol}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'right', padding: '12px 10px', fontWeight: '700', color: '#111827', fontSize: '0.875rem', fontVariantNumeric: 'tabular-nums' }}>
+                          ${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        <td style={{ textAlign: 'right', padding: '12px 10px', fontWeight: '700', fontSize: '0.875rem', color: coin.change24h >= 0 ? '#22C55E' : '#EF4444' }}>
+                          {coin.change24h >= 0 ? '▲' : '▼'} {Math.abs(coin.change24h).toFixed(2)}%
+                        </td>
+                        <td style={{ textAlign: 'right', padding: '12px 10px', color: '#6B7280', fontSize: '0.8125rem', fontVariantNumeric: 'tabular-nums' }}>
+                          ${(coin.marketCap / 1e9).toFixed(1)}B
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </Reveal>
@@ -236,6 +262,11 @@ export default function Dashboard() {
                 onFocus={e => { e.target.style.borderColor = '#1652F0'; }}
                 onBlur={e => { e.target.style.borderColor = '#E5E7EB'; }}
               >
+                {cryptoData.length === 0 && (
+                  <option value="" disabled>
+                    {loading ? 'Loading assets...' : error ? 'No assets available' : 'No assets found'}
+                  </option>
+                )}
                 {cryptoData.map(c => (
                   <option key={c.id} value={c.id}>{c.name} ({c.symbol})</option>
                 ))}
@@ -261,7 +292,7 @@ export default function Dashboard() {
               {estimatedReceive && (
                 <div style={{ background: '#EFF4FF', borderRadius: '10px', padding: '10px 14px', marginBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.8125rem', color: '#6B7280', fontWeight: '600' }}>You receive ≈</span>
-                  <span style={{ fontSize: '0.9375rem', fontWeight: '800', color: '#1652F0' }}>{estimatedReceive} {selectedCoinData?.symbol}</span>
+                  <span style={{ fontSize: '0.9375rem', fontWeight: '800', color: '#1652F0' }}>{estimatedReceive} {selectedSymbol}</span>
                 </div>
               )}
 
@@ -270,12 +301,12 @@ export default function Dashboard() {
                 onMouseEnter={e => { e.currentTarget.style.opacity = '0.88'; }}
                 onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
               >
-                {activeTab === 'buy' ? `Buy ${selectedCoinData?.symbol ?? ''}` : `Sell ${selectedCoinData?.symbol ?? ''}`}
+                {activeTab === 'buy' ? `Buy ${selectedSymbol}` : `Sell ${selectedSymbol}`}
               </button>
 
               {selectedCoinData && (
                 <p style={{ textAlign: 'center', fontSize: '0.8125rem', color: '#9CA3AF', margin: '10px 0 0', fontWeight: '600' }}>
-                  1 {selectedCoinData.symbol} = ${selectedCoinData.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  1 {selectedSymbol} = ${selectedPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </p>
               )}
             </div>
