@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? "https://coinbase-clone-backend-yxt2.onrender.com" : "http://localhost:5001");
 
 const parseBody = async (response) => {
   const contentType = response.headers.get("content-type") || "";
