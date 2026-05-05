@@ -32,9 +32,13 @@ const coinColors = {
 };
 
 function Home() {
-  const cryptoData = useLivePrices() ?? [];
+  const { coins, gainers, newListings, loading, error } = useLivePrices() ?? {};
   const [activeTab, setActiveTab] = useState('tradable');
-  const topCryptos = cryptoData.slice(0, 6);
+  const allCoins = coins || [];
+  const topCryptos = allCoins.slice(0, 6);
+  const topGainers = (gainers || []).slice(0, 6);
+  const latest = (newListings || []).slice(0, 6);
+  const activeList = activeTab === 'tradable' ? topCryptos : activeTab === 'gainers' ? topGainers : latest;
 
   const exploreRef     = useReveal();
   const advancedRef    = useReveal();
@@ -111,7 +115,17 @@ function Home() {
               ))}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {topCryptos.map((crypto) => {
+              {loading && (
+                <p style={{ color: '#9CA3AF', fontSize: '0.875rem', padding: '8px' }}>
+                  Loading market data...
+                </p>
+              )}
+              {error && !loading && (
+                <p style={{ color: '#FCA5A5', fontSize: '0.875rem', padding: '8px' }}>
+                  {error}
+                </p>
+              )}
+              {!loading && !error && activeList.map((crypto) => {
                 const isUp = crypto.change24h >= 0;
                 const iconColor = coinColors[crypto.id] || '#6B7280';
                 return (
@@ -133,6 +147,11 @@ function Home() {
                   </Link>
                 );
               })}
+              {!loading && !error && activeList.length === 0 && (
+                <p style={{ color: '#9CA3AF', fontSize: '0.875rem', padding: '8px' }}>
+                  No data available.
+                </p>
+              )}
             </div>
           </div>
         </div>

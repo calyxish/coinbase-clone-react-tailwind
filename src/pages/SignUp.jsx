@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useReveal from '../hooks/useReveal';
@@ -53,9 +53,13 @@ function SignUp() {
   const [step, setStep] = useState(1);
   const [accountType, setAccountType] = useState(null);
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   const [hoveredType, setHoveredType] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const formRef = useReveal();
 
   const handleSelectType = (typeId) => {
@@ -63,10 +67,18 @@ function SignUp() {
     setStep(2);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(email);
-    navigate('/dashboard');
+    setFormError('');
+    setSubmitting(true);
+    try {
+      await register(name, email, password);
+      navigate('/dashboard');
+    } catch (error) {
+      setFormError(error?.message || 'Sign up failed.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -139,6 +151,30 @@ function SignUp() {
 
               <form onSubmit={handleSubmit}>
                 <label style={{ display: 'block', color: '#E5E7EB', fontWeight: '600', fontSize: '0.875rem', marginBottom: '8px' }}>
+                  Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your full name"
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    border: '1.5px solid #374151',
+                    borderRadius: '10px',
+                    padding: '14px 16px',
+                    color: '#fff',
+                    fontSize: '0.9375rem',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    marginBottom: '14px',
+                  }}
+                  onFocus={e => { e.target.style.borderColor = '#4A90D9'; }}
+                  onBlur={e => { e.target.style.borderColor = '#374151'; }}
+                />
+                <label style={{ display: 'block', color: '#E5E7EB', fontWeight: '600', fontSize: '0.875rem', marginBottom: '8px' }}>
                   Email
                 </label>
                 <input
@@ -162,25 +198,55 @@ function SignUp() {
                   onFocus={e => { e.target.style.borderColor = '#4A90D9'; }}
                   onBlur={e => { e.target.style.borderColor = '#374151'; }}
                 />
-                <button
-                  type="submit"
+                <label style={{ display: 'block', color: '#E5E7EB', fontWeight: '600', fontSize: '0.875rem', marginBottom: '8px' }}>
+                  Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Create a password"
                   style={{
                     width: '100%',
-                    background: '#2C5282',
+                    background: 'transparent',
+                    border: '1.5px solid #374151',
+                    borderRadius: '10px',
+                    padding: '14px 16px',
+                    color: '#fff',
+                    fontSize: '0.9375rem',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    marginBottom: '14px',
+                  }}
+                  onFocus={e => { e.target.style.borderColor = '#4A90D9'; }}
+                  onBlur={e => { e.target.style.borderColor = '#374151'; }}
+                />
+                {formError && (
+                  <p style={{ color: '#FCA5A5', fontSize: '0.8125rem', margin: '-4px 0 14px' }}>
+                    {formError}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  style={{
+                    width: '100%',
+                    background: submitting ? '#1E3A5F' : '#2C5282',
                     color: '#fff',
                     fontWeight: '700',
                     fontSize: '1rem',
                     padding: '14px',
                     borderRadius: '10px',
                     border: 'none',
-                    cursor: 'pointer',
+                    cursor: submitting ? 'not-allowed' : 'pointer',
                     marginBottom: '20px',
                     letterSpacing: '0.01em',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#2A4A75'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = '#2C5282'; }}
+                  onMouseEnter={e => { if (!submitting) e.currentTarget.style.background = '#2A4A75'; }}
+                  onMouseLeave={e => { if (!submitting) e.currentTarget.style.background = '#2C5282'; }}
                 >
-                  Continue
+                  {submitting ? 'Creating account...' : 'Continue'}
                 </button>
               </form>
 

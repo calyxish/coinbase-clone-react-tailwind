@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import FooterDisclaimer from './FooterDisclaimer';
 
 /* Each column in the main footer grid. Some visual columns contain multiple
    sections (heading + links), so we model them as groups. */
@@ -159,6 +160,7 @@ function Footer() {
 
       {/* Bottom bar */}
       <div style={{ borderTop: '1px solid #E5E7EB' }}>
+        <FooterDisclaimer />
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '20px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }} className="footer-bottom-bar">
           {/* Legal */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
