@@ -218,7 +218,7 @@ export default function Dashboard() {
                           ${coin.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
                         <td style={{ textAlign: 'right', padding: '12px 10px', fontWeight: '700', fontSize: '0.875rem', color: coin.change24h >= 0 ? '#22C55E' : '#EF4444' }}>
-                          {coin.change24h >= 0 ? '▲' : '▼'} {Math.abs(coin.change24h).toFixed(2)}%
+                          {coin.change24h >= 0 ? '+' : ''}{coin.change24h.toFixed(2)}%
                         </td>
                         <td style={{ textAlign: 'right', padding: '12px 10px', color: '#6B7280', fontSize: '0.8125rem', fontVariantNumeric: 'tabular-nums' }}>
                           {coin.marketCap ? `$${(coin.marketCap / 1e9).toFixed(1)}B` : '---'}

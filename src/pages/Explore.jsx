@@ -264,7 +264,7 @@ function Explore() {
                       </div>
                       <p style={{ fontSize: '0.8125rem', fontWeight: '700', color: '#111827', margin: 0 }}>{crypto.symbol}</p>
                       <p style={{ fontSize: '0.9375rem', fontWeight: '800', color: isUp ? '#16A34A' : '#DC2626', margin: 0 }}>
-                        {isUp ? '↗' : '↘'} {Math.abs(crypto.change24h).toFixed(2)}%
+                        {isUp ? '+' : ''}{crypto.change24h.toFixed(2)}%
                       </p>
                       <p style={{ fontSize: '0.75rem', color: '#6B7280', margin: 0 }}>{fmt(crypto.price)}</p>
                     </Link>
