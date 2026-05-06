@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services';
+import { useLivePrices } from '../context/LivePricesContext';
 
 export default function AddCrypto() {
   const navigate = useNavigate();
+  const { refreshPrices } = useLivePrices() ?? {};
   const [formData, setFormData] = useState({
     name: '',
     symbol: '',
@@ -34,6 +36,12 @@ export default function AddCrypto() {
         image: formData.image,
         change24h: parseFloat(formData.change24h)
       });
+      
+      // Trigger a refresh of the context data so the dashboard updates instantly
+      if (refreshPrices) {
+        await refreshPrices();
+      }
+
       // Give it a brief moment so the user sees it succeeded
       setTimeout(() => {
         navigate('/dashboard');
