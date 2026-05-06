@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLivePrices } from '../context/LivePricesContext';
 import { useAuth } from '../context/AuthContext';
 import useReveal from '../hooks/useReveal';
@@ -34,6 +34,21 @@ const coinColors = {
 
 function Home() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [email1, setEmail1] = useState('');
+  const [email2, setEmail2] = useState('');
+  const [email3, setEmail3] = useState('');
+
+  const handleEmailSubmit = (e, emailVal) => {
+    e.preventDefault();
+    if (!emailVal) return;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(emailVal)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    navigate(`/signup?email=${encodeURIComponent(emailVal)}`);
+  };
   const { coins, gainers, newListings, loading, error } = useLivePrices() ?? {};
   const [activeTab, setActiveTab] = useState('tradable');
   const allCoins = coins || [];
@@ -78,19 +93,22 @@ function Home() {
             </p>
             <div style={{ display: 'flex', gap: '8px' }} className="hero-cta-row">
               {!user ? (
-                <>
+                <form onSubmit={(e) => handleEmailSubmit(e, email2)} style={{ display: 'flex', gap: '8px', width: '100%' }}>
                   <input
                     type="email"
+                    required
+                    value={email2}
+                    onChange={(e) => setEmail2(e.target.value)}
                     placeholder="satoshi@nakamoto.com"
                     style={{ flex: 1, padding: '13px 16px', border: '1.5px solid #E5E7EB', borderRadius: '8px', fontSize: '0.9375rem', color: '#111827', outline: 'none', minWidth: 0 }}
                   />
-                  <Link
-                    to="/signup"
-                    style={{ background: '#1652F0', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 24px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}
+                  <button
+                    type="submit"
+                    style={{ background: '#1652F0', border: 'none', cursor: 'pointer', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 24px', borderRadius: '8px', whiteSpace: 'nowrap', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}
                   >
                     Sign up
-                  </Link>
-                </>
+                  </button>
+                </form>
               ) : (
                 <Link
                   to="/dashboard"
@@ -371,19 +389,22 @@ function Home() {
             </p>
             <div style={{ display: 'flex', gap: '8px' }} className="hero-cta-row">
               {!user ? (
-                <>
+                <form onSubmit={(e) => handleEmailSubmit(e, email3)} style={{ display: 'flex', gap: '8px', width: '100%' }}>
                   <input
                     type="email"
+                    required
+                    value={email3}
+                    onChange={(e) => setEmail3(e.target.value)}
                     placeholder="satoshi@nakamoto.com"
                     style={{ flex: 1, padding: '13px 16px', border: '1.5px solid #E5E7EB', borderRadius: '8px', fontSize: '0.9375rem', color: '#111827', outline: 'none', minWidth: 0 }}
                   />
-                  <Link
-                    to="/signup"
-                    style={{ background: '#1652F0', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 24px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}
+                  <button
+                    type="submit"
+                    style={{ background: '#1652F0', border: 'none', cursor: 'pointer', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 24px', borderRadius: '8px', whiteSpace: 'nowrap', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}
                   >
                     Sign up
-                  </Link>
-                </>
+                  </button>
+                </form>
               ) : (
                 <Link
                   to="/dashboard"
