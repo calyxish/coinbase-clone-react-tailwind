@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useLivePrices } from '../context/LivePricesContext';
+import { useAuth } from '../context/AuthContext';
 import useReveal from '../hooks/useReveal';
 
 // useReveal is imported from src/hooks/useReveal.js
@@ -87,6 +88,7 @@ function NavArrows({ onPrev, onNext, prevDisabled, nextDisabled, size = 32 }) {
 }
 
 function Explore() {
+  const { user } = useAuth();
   const [searchTerm,   setSearchTerm]   = useState('');
   const [statsOffset,  setStatsOffset]  = useState(0);
   const [moversOffset, setMoversOffset] = useState(0);
@@ -206,29 +208,31 @@ function Explore() {
           <div ref={sidebarRef} style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '28px' }} className="reveal reveal-right">
 
             {/* Get started card */}
-            <div style={{ background: '#1652F0', borderRadius: '16px', padding: '22px', position: 'relative', overflow: 'hidden' }}>
-              {/* Decorative rings */}
-              <div style={{ position: 'absolute', top: '-28px', right: '-28px', width: '120px', height: '120px', borderRadius: '50%', border: '22px solid rgba(255,255,255,0.1)', pointerEvents: 'none' }}/>
-              {/* Coin illustration */}
-              <div style={{ position: 'absolute', top: '14px', right: '16px', display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
-                <div style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'linear-gradient(135deg,#F59E0B,#D97706)', border: '3px solid rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 16px rgba(0,0,0,0.28)', zIndex: 1 }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
+            {!user && (
+              <div style={{ background: '#1652F0', borderRadius: '16px', padding: '22px', position: 'relative', overflow: 'hidden' }}>
+                {/* Decorative rings */}
+                <div style={{ position: 'absolute', top: '-28px', right: '-28px', width: '120px', height: '120px', borderRadius: '50%', border: '22px solid rgba(255,255,255,0.1)', pointerEvents: 'none' }}/>
+                {/* Coin illustration */}
+                <div style={{ position: 'absolute', top: '14px', right: '16px', display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                  <div style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'linear-gradient(135deg,#F59E0B,#D97706)', border: '3px solid rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 16px rgba(0,0,0,0.28)', zIndex: 1 }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '4px' }}>
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#4ADE80', border: '2px solid rgba(255,255,255,0.5)' }}/>
+                    <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: 'rgba(255,255,255,0.4)', border: '2px solid rgba(255,255,255,0.35)' }}/>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '4px' }}>
-                  <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#4ADE80', border: '2px solid rgba(255,255,255,0.5)' }}/>
-                  <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: 'rgba(255,255,255,0.4)', border: '2px solid rgba(255,255,255,0.35)' }}/>
-                </div>
-              </div>
 
-              <p style={{ fontSize: '1.0625rem', fontWeight: '800', color: '#fff', margin: '0 0 5px', paddingRight: '86px' }}>Get started</p>
-              <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.82)', margin: '0 0 18px', lineHeight: '1.5' }}>Create your account today</p>
-              <Link to="/signup" style={{ display: 'inline-block', background: '#fff', color: '#111827', fontWeight: '700', fontSize: '0.875rem', padding: '9px 22px', borderRadius: '9px', textDecoration: 'none' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#F3F4F6'}
-                onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-              >
-                Sign up
-              </Link>
-            </div>
+                <p style={{ fontSize: '1.0625rem', fontWeight: '800', color: '#fff', margin: '0 0 5px', paddingRight: '86px' }}>Get started</p>
+                <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.82)', margin: '0 0 18px', lineHeight: '1.5' }}>Create your account today</p>
+                <Link to="/signup" style={{ display: 'inline-block', background: '#fff', color: '#111827', fontWeight: '700', fontSize: '0.875rem', padding: '9px 22px', borderRadius: '9px', textDecoration: 'none' }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#F3F4F6'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+                >
+                  Sign up
+                </Link>
+              </div>
+            )}
 
             {/* Top movers */}
             <div style={{ border: '1px solid #E5E7EB', borderRadius: '16px', padding: '18px', background: '#fff' }}>
