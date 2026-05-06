@@ -64,6 +64,17 @@ export default function Dashboard() {
 
   const displayName = user?.email?.split('@')[0] ?? 'there';
 
+  const hour = new Date().getHours();
+  let greeting = 'Good evening';
+  if (hour < 12) greeting = 'Good morning';
+  else if (hour < 18) greeting = 'Good afternoon';
+
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
   return (
     <div style={{ background: '#F3F4F6', minHeight: 'calc(100vh - 65px)' }}>
 
@@ -72,10 +83,10 @@ export default function Dashboard() {
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <h1 style={{ fontSize: 'clamp(1.1rem,3vw,1.375rem)', fontWeight: '800', color: '#111827', margin: 0, letterSpacing: '-0.02em' }}>
-              Good morning, <span style={{ color: '#1652F0' }}>{displayName}</span>
+              {greeting}, <span style={{ color: '#1652F0' }}>{displayName}</span>
             </h1>
             <p style={{ color: '#6B7280', fontSize: '0.875rem', margin: '3px 0 0', fontWeight: '500' }}>
-              March 8, 2026 · Your portfolio at a glance
+              {currentDate} · Your portfolio at a glance
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
