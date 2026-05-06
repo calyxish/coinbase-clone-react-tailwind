@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import useReveal from '../hooks/useReveal';
 
@@ -52,7 +52,9 @@ const ACCOUNT_TYPES = [
 function SignUp() {
   const [step, setStep] = useState(1);
   const [accountType, setAccountType] = useState(null);
-  const [email, setEmail] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialEmail = searchParams.get('email') || '';
+  const [email, setEmail] = useState(initialEmail);
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [hoveredType, setHoveredType] = useState(null);
@@ -61,6 +63,12 @@ function SignUp() {
   const navigate = useNavigate();
   const { register } = useAuth();
   const formRef = useReveal();
+
+  useEffect(() => {
+    if (initialEmail) {
+      setStep(2);
+    }
+  }, [initialEmail]);
 
   const handleSelectType = (typeId) => {
     setAccountType(typeId);
