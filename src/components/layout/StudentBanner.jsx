@@ -10,7 +10,7 @@ export default function StudentBanner() {
       zIndex: 1000,
       position: 'relative'
     }}>
-      ⚠️ This is a student portfolio project and is NOT affiliated with Coinbase.
+      This is a student portfolio project and is NOT affiliated with Coinbase.
     </div>
   );
 }
