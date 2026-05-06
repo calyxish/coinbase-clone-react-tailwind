@@ -17,6 +17,13 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setFormError('Please enter a valid email address.');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await login(email, password);
