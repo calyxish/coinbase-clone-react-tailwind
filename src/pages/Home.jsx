@@ -1,6 +1,7 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLivePrices } from '../context/LivePricesContext';
+import { useAuth } from '../context/AuthContext';
 import useReveal from '../hooks/useReveal';
 
 import heroImg from '../assets/Hero__4_.avif';
@@ -32,6 +33,7 @@ const coinColors = {
 };
 
 function Home() {
+  const { user } = useAuth();
   const { coins, gainers, newListings, loading, error } = useLivePrices() ?? {};
   const [activeTab, setActiveTab] = useState('tradable');
   const allCoins = coins || [];
@@ -75,17 +77,28 @@ function Home() {
               Trade crypto and more on a platform you can trust.
             </p>
             <div style={{ display: 'flex', gap: '8px' }} className="hero-cta-row">
-              <input
-                type="email"
-                placeholder="satoshi@nakamoto.com"
-                style={{ flex: 1, padding: '13px 16px', border: '1.5px solid #E5E7EB', borderRadius: '8px', fontSize: '0.9375rem', color: '#111827', outline: 'none', minWidth: 0 }}
-              />
-              <Link
-                to="/signup"
-                style={{ background: '#1652F0', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 24px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}
-              >
-                Sign up
-              </Link>
+              {!user ? (
+                <>
+                  <input
+                    type="email"
+                    placeholder="satoshi@nakamoto.com"
+                    style={{ flex: 1, padding: '13px 16px', border: '1.5px solid #E5E7EB', borderRadius: '8px', fontSize: '0.9375rem', color: '#111827', outline: 'none', minWidth: 0 }}
+                  />
+                  <Link
+                    to="/signup"
+                    style={{ background: '#1652F0', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 24px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    Sign up
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  to="/dashboard"
+                  style={{ background: '#1652F0', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 24px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center' }}
+                >
+                  Go to Dashboard
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -193,9 +206,15 @@ function Home() {
             <p style={{ fontSize: '1rem', color: '#6B7280', lineHeight: '1.7', marginBottom: '24px' }}>
               Get more out of crypto with one membership: zero trading fees, boosted rewards, priority support, and more.
             </p>
-            <Link to="/signup" style={{ display: 'inline-block', background: '#111827', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 28px', borderRadius: '99px', textDecoration: 'none' }}>
-              Claim free trial
-            </Link>
+            {!user ? (
+              <Link to="/signup" style={{ display: 'inline-block', background: '#111827', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 28px', borderRadius: '99px', textDecoration: 'none' }}>
+                Claim free trial
+              </Link>
+            ) : (
+              <Link to="/dashboard" style={{ display: 'inline-block', background: '#111827', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 28px', borderRadius: '99px', textDecoration: 'none' }}>
+                Go to Dashboard
+              </Link>
+            )}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{ background: '#F3F4F6', borderRadius: '24px', padding: '24px', maxWidth: '360px', width: '100%' }}>
@@ -351,17 +370,28 @@ function Home() {
               Start your portfolio today and discover crypto
             </p>
             <div style={{ display: 'flex', gap: '8px' }} className="hero-cta-row">
-              <input
-                type="email"
-                placeholder="satoshi@nakamoto.com"
-                style={{ flex: 1, padding: '13px 16px', border: '1.5px solid #E5E7EB', borderRadius: '8px', fontSize: '0.9375rem', color: '#111827', outline: 'none', minWidth: 0 }}
-              />
-              <Link
-                to="/signup"
-                style={{ background: '#1652F0', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 24px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}
-              >
-                Sign up
-              </Link>
+              {!user ? (
+                <>
+                  <input
+                    type="email"
+                    placeholder="satoshi@nakamoto.com"
+                    style={{ flex: 1, padding: '13px 16px', border: '1.5px solid #E5E7EB', borderRadius: '8px', fontSize: '0.9375rem', color: '#111827', outline: 'none', minWidth: 0 }}
+                  />
+                  <Link
+                    to="/signup"
+                    style={{ background: '#1652F0', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 24px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    Sign up
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  to="/dashboard"
+                  style={{ background: '#1652F0', color: '#fff', fontWeight: '700', fontSize: '0.9375rem', padding: '13px 24px', borderRadius: '8px', textDecoration: 'none', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center' }}
+                >
+                  Go to Dashboard
+                </Link>
+              )}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
