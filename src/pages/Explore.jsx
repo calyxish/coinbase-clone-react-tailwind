@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useLivePrices } from '../context/LivePricesContext';
 import useReveal from '../hooks/useReveal';
@@ -113,6 +113,7 @@ function Explore() {
   const fmt = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
   const fmtMC = (mc) => {
+    if (!mc) return '---';
     if (mc >= 1e12) return `$${(mc / 1e12).toFixed(2)}T`;
     if (mc >= 1e9)  return `$${(mc / 1e9).toFixed(2)}B`;
     return `$${(mc / 1e6).toFixed(2)}M`;

@@ -221,7 +221,7 @@ export default function Dashboard() {
                           {coin.change24h >= 0 ? '▲' : '▼'} {Math.abs(coin.change24h).toFixed(2)}%
                         </td>
                         <td style={{ textAlign: 'right', padding: '12px 10px', color: '#6B7280', fontSize: '0.8125rem', fontVariantNumeric: 'tabular-nums' }}>
-                          ${(coin.marketCap / 1e9).toFixed(1)}B
+                          {coin.marketCap ? `$${(coin.marketCap / 1e9).toFixed(1)}B` : '---'}
                         </td>
                       </tr>
                     ))}
