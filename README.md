@@ -7,7 +7,7 @@ In this assignment, you will build a full clone of the [Coinbase](https://www.co
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 After accepting this assignment, follow these steps:
 
