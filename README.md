@@ -43,7 +43,7 @@ The app will be available at `http://localhost:5173`
 
 ---
 
-## 🔌 Backend Integration
+## Backend Integration
 
 The frontend expects the following backend endpoints:
 
